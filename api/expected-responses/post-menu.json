@@ -1,0 +1,91 @@
+{
+    "id": 1,
+    "description": "Menu de Hambuguers",
+    "enabled": true,
+    "minimumOrder": 10000,
+    "company": {
+        "id": 1,
+        "name": "Bar do Zé",
+        "description": "aaa",
+        "companyCode": "bar-do-ze",
+        "whatsApp": "",
+        "hasDelivery": false,
+        "hasWithdrawn": false,
+        "theme": "",
+        "image": "",
+        "imageUrl": null,
+        "phone": "1231231312",
+        "sections": [],
+        "addresses": [],
+        "paymentTypes": [],
+        "openingHours": []
+    },
+    "categories": [
+        {
+            "id": 1,
+            "name": "Lanches",
+            "description": "Lanches Nervosos",
+            "order": 0,
+            "enabled": true,
+            "products": [
+                {
+                    "id": 1,
+                    "name": "Hamburgao nervosíssimo",
+                    "description": "Coma um e cague ate as tripas",
+                    "price": 20000,
+                    "order": 0,
+                    "enabled": true,
+                    "image": "mala2.png",
+                    "imageUrl": "https://s3.us-east-2.amazonaws.com/cardapin.images/mala2.png",
+                    "adultsOnly": false,
+                    "additionalItemsGroups": []
+                },
+                {
+                    "id": 2,
+                    "name": "Hamburgao caro pra carai",
+                    "description": "Seu lanche gourmet sem nada mas caro pra cacete pra postar no insta",
+                    "price": 30000,
+                    "order": 0,
+                    "enabled": true,
+                    "image": "mala3.png",
+                    "imageUrl": "https://s3.us-east-2.amazonaws.com/cardapin.images/mala3.png",
+                    "adultsOnly": false,
+                    "additionalItemsGroups": []
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "name": "Bebidas",
+            "description": "Bebidas que destroem seu estomago",
+            "order": 1,
+            "enabled": false,
+            "products": [
+                {
+                    "id": 3,
+                    "name": "Cachacinca Marvada",
+                    "description": "A Verdadeira Cachaça dos pingaiada de bar",
+                    "price": 1000,
+                    "order": 0,
+                    "enabled": true,
+                    "image": "mala4.png",
+                    "imageUrl": "https://s3.us-east-2.amazonaws.com/cardapin.images/mala4.png",
+                    "adultsOnly": true,
+                    "additionalItemsGroups": []
+                },
+                {
+                    "id": 4,
+                    "name": "Suco de Batata Doce",
+                    "description": "A bebida dos crosfiteiros",
+                    "price": 30000,
+                    "order": 1,
+                    "enabled": true,
+                    "image": "mala5.png",
+                    "imageUrl": "https://s3.us-east-2.amazonaws.com/cardapin.images/mala5.png",
+                    "adultsOnly": true,
+                    "additionalItemsGroups": []
+                }
+            ]
+        }
+    ]
+}

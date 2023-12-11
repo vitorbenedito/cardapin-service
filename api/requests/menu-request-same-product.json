@@ -1,0 +1,80 @@
+{
+    "description": "Menu de Hambuguers",
+    "minimumOrder": 10000,
+    "enabled": true,
+    "company": {
+        "id": 1
+    },
+    "categories": [{
+            "name": "Lanches",
+            "description": "Lanches Nervosos",
+            "order": 0,
+            "enabled": true,
+            "products": [{
+                    "name": "Hamburgao nervosíssimo",
+                    "description": "Coma um e cague ate as tripas",
+                    "price": 20000,
+                    "order": 0,
+                    "enabled": true,
+                    "image": "url",
+                    "adultsOnly": false,
+                    "additionalItemsGroups": [{
+                        "id": 1
+                    }]
+                },
+                {
+                    "name": "Hamburgao caro pra carai",
+                    "description": "Seu lanche gourmet sem nada mas caro pra cacete pra postar no insta",
+                    "price": 30000,
+                    "order": 0,
+                    "enabled": true,
+                    "image": {
+                        "id": 0
+                    },
+                    "adultsOnly": false,
+                    "additionalItemsGroups": [{
+                        "id": 1
+                    }]
+                }
+            ]
+        },
+        {
+            "name": "Bebidas",
+            "description": "Bebidas que destroem seu estomago",
+            "order": 1,
+            "enabled": false,
+            "products": [{
+                    "name": "Cachacinca Marvada",
+                    "description": "A Verdadeira Cachaça dos pingaiada de bar",
+                    "price": 1000,
+                    "order": 0,
+                    "enabled": true,
+                    "image":"",
+                    "adultsOnly": true,
+                    "additionalItemsGroups": [{
+                        "id": 2
+                    }
+                    ]
+                },
+                {
+                    "name": "Suco de Batata Doce",
+                    "description": "A bebida dos crosfiteiros",
+                    "price": 30000,
+                    "order": 1,
+                    "enabled": true,
+                    "image": "",
+                    "adultsOnly": true
+                },
+                {
+                    "name": "Suco de Batata Doce",
+                    "description": "A bebida dos crosfiteiros",
+                    "price": 30000,
+                    "order": 1,
+                    "enabled": true,
+                    "image": "",
+                    "adultsOnly": true
+                }
+            ]
+        }
+    ]
+}

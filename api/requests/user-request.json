@@ -1,0 +1,23 @@
+{
+    "id": 2,
+    "name": "Vitor Nunes Benedito Mamutao",
+    "login": "mamute",
+    "email": "mamute@lesadao.com",
+    "company": {
+        "id": 1,
+        "name": "Bar do Zé",
+        "description": "aaa",
+        "companyCode": "bar-do-ze",
+        "whatsApp": "",
+        "hasDelivery": false,
+        "hasWithdrawn": false,
+        "theme": "",
+        "image": "",
+        "imageUrl": "https://s3.us-east-2.amazonaws.com/cardapin.images/",
+        "phone": "1231231312",
+        "sections": [],
+        "addresses": [],
+        "paymentTypes": [],
+        "openingHours": []
+    }
+}

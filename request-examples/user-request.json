@@ -1,0 +1,12 @@
+{
+    "name": "Vitor Nunes Benedito Mamutao",
+    "login": "mamute",
+    "email": "mamute@lesadao.com",
+    "password": "123",
+    "company": {
+        "name": "Bar do Zé",
+        "description": "aaa",
+        "companyCode": "bar-do-ze",
+        "phone": "1231231312"
+    }
+}

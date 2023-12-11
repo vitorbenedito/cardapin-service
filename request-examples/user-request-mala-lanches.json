@@ -1,0 +1,10 @@
+{
+    "name": "Felipe Mala Paraibuna",
+    "login": "felipe",
+    "email": "felipe@parai.buna",
+    "password": "123",
+    "company": {
+        "name": "Mala Lanches",
+        "companyCode": "mala-lanches"
+    }
+}

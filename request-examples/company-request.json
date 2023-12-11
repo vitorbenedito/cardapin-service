@@ -1,0 +1,60 @@
+{
+    "id": 1,
+    "name": "Bar do Zé",
+    "description": "aaa",
+    "companyCode": "bar-do-ze",
+    "image": "mala1.png",
+    "phone": "12997861092",
+    "whatsApp": "12997861092",
+    "hasDelivery": true,
+    "hasWithdrawn": true,
+    "theme": "green",
+    "sections": [
+        {
+            "id": 5
+        },
+        {
+            "id": 2
+        }
+    ],
+    "addresses": [
+        {
+            "id": 1,
+            "address": "Rua Rio Grande do Sul",
+            "area": "Vila Sao Geraldo",
+            "city": "Taubate",
+            "state": "SP",
+            "postalCode": "12012080",
+            "complement": "aaa",
+            "number": "98"
+        }
+    ],
+    "paymentTypes": [
+        {
+            "id": 2
+        },
+        {
+            "id": 5
+        },
+        {
+            "id": 7
+        },
+        {
+            "id": 11
+        }
+    ],
+    "openingHours": [
+        {
+            "startDay": "SUNDAY",
+            "endDay": "WEDNESDAY",
+            "startTime": "08:00",
+            "endTime": "19:00"
+        },
+        {
+            "startDay": "THURSDAY",
+            "endDay": "SATURDAY",
+            "startTime": "08:00",
+            "endTime": "23:00"
+        }
+    ]
+}

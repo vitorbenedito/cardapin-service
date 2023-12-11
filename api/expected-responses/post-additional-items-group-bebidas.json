@@ -1,0 +1,37 @@
+{
+    "ID": 2,
+    "name": "Opcionais de Bebidas",
+    "description": "Além de comer, beba até passar mal",
+    "order": 0,
+    "minimumItems": 1,
+    "maximumItems": 10,
+    "enabled": true,
+    "company": {
+        "id": 1,
+        "name": "",
+        "companyCode": ""
+    },
+    "additionalItems": [
+        {
+            "id": 3,
+            "name": "Gelo",
+            "price": 100,
+            "description": "Mais gelo",
+            "enabled": true
+        },
+        {
+            "id": 4,
+            "name": "Limão",
+            "price": 100,
+            "description": "Limãozinho pra coquinha",
+            "enabled": false
+        },
+        {
+            "id": 5,
+            "name": "Açúcar",
+            "price": 100,
+            "description": "Aqui até o açúcar é cobrado",
+            "enabled": false
+        }
+    ]
+}

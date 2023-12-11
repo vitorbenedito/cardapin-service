@@ -1,0 +1,30 @@
+{
+    "ID": 1,
+    "name": "Opcionais de Hamburguer",
+    "description": "Só para os gordoes que so o lanche nao basta",
+    "order": 0,
+    "minimumItems": 1,
+    "maximumItems": 10,
+    "enabled": true,
+    "company": {
+        "id": 1,
+        "name": "",
+        "companyCode": ""
+    },
+    "additionalItems": [
+        {
+            "id": 1,
+            "name": "Queijo extra",
+            "price": 100,
+            "description": "Queijo mussarela",
+            "enabled": true
+        },
+        {
+            "id": 2,
+            "name": "Presunto extra",
+            "price": 100,
+            "description": "Apresuntado do mais barato",
+            "enabled": false
+        }
+    ]
+}

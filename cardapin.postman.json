@@ -1,0 +1,315 @@
+{
+	"info": {
+		"_postman_id": "d6f60c65-1db4-4a55-9715-92259ecff936",
+		"name": "Cardappin",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Menu",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-cardapin-auth-token",
+						"value": "{{cardapin_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"description\": \"Menu de Hambuguers\",\n    \"minimumOrder\": 10000,\n    \"enabled\": true,\n    \"company\": {\n        \"id\": 1\n    },\n    \"categories\": [{\n            \"name\": \"Lanches\",\n            \"description\": \"Lanches Nervosos\",\n            \"order\": 0,\n            \"enabled\": true,\n            \"products\": [{\n                    \"name\": \"Hamburgao nervosíssimo\",\n                    \"description\": \"Coma um e cague ate as tripas\",\n                    \"price\": 20000,\n                    \"order\": 0,\n                    \"enabled\": true,\n                    \"image\": \"mala2.png\",\n                    \"adultsOnly\": false,\n                    \"additionalItemsGroups\": [{\n                        \"id\": 1\n                    }]\n                },\n                {\n                    \"name\": \"Hamburgao caro pra carai\",\n                    \"description\": \"Seu lanche gourmet sem nada mas caro pra cacete pra postar no insta\",\n                    \"price\": 30000,\n                    \"order\": 0,\n                    \"enabled\": true,\n                    \"image\": \"mala3.png\",\n                    \"adultsOnly\": false,\n                    \"additionalItemsGroups\": [{\n                        \"id\": 1\n                    }]\n                }\n            ]\n        },\n        {\n            \"name\": \"Bebidas\",\n            \"description\": \"Bebidas que destroem seu estomago\",\n            \"order\": 1,\n            \"enabled\": false,\n            \"products\": [{\n                    \"name\": \"Cachacinca Marvada\",\n                    \"description\": \"A Verdadeira Cachaça dos pingaiada de bar\",\n                    \"price\": 1000,\n                    \"order\": 0,\n                    \"enabled\": true,\n                    \"image\": \"mala4.png\",\n                    \"adultsOnly\": true,\n                    \"additionalItemsGroups\": [{\n                        \"id\": 2\n                    }\n                    ]\n                },\n                {\n                    \"name\": \"Suco de Batata Doce\",\n                    \"description\": \"A bebida dos crosfiteiros\",\n                    \"price\": 30000,\n                    \"order\": 1,\n                    \"enabled\": true,\n                    \"image\": \"mala5.png\",\n                    \"adultsOnly\": true\n                }\n            ]\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/menus",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"menus"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create User - Mamute",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-cardapin-auth-token",
+						"value": "{{cardapin_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Vitor Nunes Benedito Mamutao\",\n    \"login\": \"mamute\",\n    \"email\": \"mamute@lesadao.com\",\n    \"password\": \"123\",\n    \"company\": {\n        \"name\": \"Bar do Zé\",\n        \"description\": \"aaa\",\n        \"companyCode\": \"bar-do-ze\",\n        \"phone\": \"1231231312\"\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/users",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Company",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "x-cardapin-auth-token",
+						"value": "{{cardapin_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": 1,\n    \"name\": \"Bar do Zé\",\n    \"description\": \"aaa\",\n    \"companyCode\": \"bar-do-ze\",\n    \"image\": \"mala1.png\",\n    \"phone\": \"12997861092\",\n    \"whatsApp\": \"12997861092\",\n    \"hasDelivery\": true,\n    \"hasWithdrawn\": true,\n    \"theme\": \"green\",\n    \"sections\": [\n        {\n            \"id\": 5\n        },\n        {\n            \"id\": 2\n        }\n    ],\n    \"addresses\": [\n        {\n            \"id\": 1,\n            \"address\": \"Rua Rio Grande do Sul\",\n            \"area\": \"Vila Sao Geraldo\",\n            \"city\": \"Taubate\",\n            \"state\": \"SP\",\n            \"postalCode\": \"12012080\",\n            \"complement\": \"aaa\",\n            \"number\": \"98\"\n        }\n    ],\n    \"paymentTypes\": [\n        {\n            \"id\": 2\n        },\n        {\n            \"id\": 5\n        },\n        {\n            \"id\": 7\n        },\n        {\n            \"id\": 11\n        }\n    ],\n    \"openingHours\": [\n        {\n            \"startDay\": \"SUNDAY\",\n            \"endDay\": \"WEDNESDAY\",\n            \"startTime\": \"08:00\",\n            \"endTime\": \"19:00\"\n        },\n        {\n            \"startDay\": \"THURSDAY\",\n            \"endDay\": \"SATURDAY\",\n            \"startTime\": \"08:00\",\n            \"endTime\": \"23:00\"\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/companies/1",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"companies",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET Company Copy",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"id\": 1,\n    \"name\": \"Bar do Zé\",\n    \"Description\": \"aaa\",\n    \"Image\": {\n        \"id\": 1\n    },\n    \"phone\":\"1231231312\",\n    \"section\": [{\n        \"name\": \"Alimentos\"\n    }],\n    \"address\": [{\n        \"adress\": \"Rua Rio Grande do Sul, n 98 - Vila São Geraldo\",\n        \"city\": \"Taubate\",\n        \"state\": \"SP\",\n        \"postalCode\": \"123\",\n        \"complement\": \"aaa\"\n    }\n    ],\n    \"paymentType\": [\n        {\n            \"name\": \"MasterCard Credito\"\n        }\n    ],\n    \"openingHours\": [\n        {\n            \"day\": \"MONDAY\",\n\t        \"startTime\": \"2020-06-20T19:27:42.983762543Z\",\n            \"endTime\": \"2020-06-20T19:27:42.983762543Z\"\n        }\n    ]\n\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/companies/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"companies",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "9ea7449d-9112-42fe-9f1f-f36b6e81cba1",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "142d899a-0177-4e80-8737-4dd3223e2506",
+						"exec": [
+							"pm.globals.set(\"cardapin_token\", responseHeaders['x-cardapin-auth-token']);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"login\": \"cardapin-admin\",\n    \"password\":\"54b8117a6b9e1d4bfd16706a7e67da6f\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/login",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Additional Items - Hamburguer",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-cardapin-auth-token",
+						"value": "{{cardapin_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Opcionais de Hamburguer\",\n    \"description\": \"Só para os gordoes que so o lanche nao basta\",\n    \"order\": 0,\n    \"enabled\": true,\n    \"minimumItems\": 1,    \n\t\"maximumItems\": 10,\n    \"additionalItems\": [{\n            \"name\": \"Queijo extra\",\n            \"description\": \"Queijo mussarela\",\n            \"price\": 100,\n            \"enabled\": true\n        },\n        {\n            \"name\": \"Presunto extra\",\n            \"description\": \"Apresuntado do mais barato\",\n            \"price\": 100,\n            \"enabled\": true\n        },\n        {\n            \"name\": \"Azeitona\",\n            \"description\": \"Azeitona da boa\",\n            \"price\": 100,\n            \"enabled\": true\n        },\n        {\n            \"name\": \"Arroz e feijão\",\n            \"description\": \"Arroz no lanche\",\n            \"price\": 100,\n            \"enabled\": true\n        },\n        {\n            \"name\": \"Maionese\",\n            \"description\": \"Maionese que da liga\",\n            \"price\": 100,\n            \"enabled\": true\n        },\n        {\n            \"name\": \"Bacon\",\n            \"description\": \"Bacon é vida\",\n            \"price\": 100,\n            \"enabled\": true\n        }\n    ],\n    \"company\": {\n        \"id\": 1\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/additional-items-groups",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"additional-items-groups"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST Additional Items - Bebidas",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-cardapin-auth-token",
+						"type": "text",
+						"value": "{{cardapin_token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Opcionais de Bebidas\",\n    \"description\": \"Além de comer, beba até passar mal\",\n    \"order\": 0,\n    \"enabled\": true,\n    \"minimumItems\": 1,    \n\t\"maximumItems\": 10,\n    \"additionalItems\": [{\n            \"name\": \"Gelo\",\n            \"description\": \"Mais gelo\",\n            \"price\": 100,\n            \"enabled\": true\n        },\n        {\n            \"name\": \"Limão\",\n            \"description\": \"Limãozinho pra coquinha\",\n            \"price\": 100,\n            \"enabled\": false\n        },\n        {\n            \"name\": \"Açúcar\",\n            \"description\": \"Aqui até o açúcar é cobrado\",\n            \"price\": 100,\n            \"enabled\": false\n        }\n    ],\n    \"company\": {\n        \"id\": 1\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/additional-items-groups",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"additional-items-groups"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Client",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-cardapin-auth-token",
+						"type": "text",
+						"value": "{{cardapin_token}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Vitor Nunes\",\n    \"phone\" : 12997861092,\n    \"address\": \"Rua General Carlos Mamute, n 24\",\n    \"area\": \"Jardim Satélite\",\n    \"city\": \"São José dos Campos\",\n    \"state\": \"SP\",\n    \"postalCode\": \"12345-000\",\n    \"complement\": \"Zona Sul\",\n    \"landmark\": \"Próximo a Av. Perseu\",\n    \"number\": \"900\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/clients",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"clients"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create User - Felipe Mala",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-cardapin-auth-token",
+						"value": "{{cardapin_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Felipe Mala Paraibuna\",\n    \"login\": \"felipe\",\n    \"email\": \"felipe@parai.buna\",\n    \"password\": \"123\",\n    \"company\": {\n        \"name\": \"Mala Lanches\",\n        \"companyCode\": \"mala-lanches\"\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/users",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

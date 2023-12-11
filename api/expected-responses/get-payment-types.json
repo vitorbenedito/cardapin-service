@@ -1,0 +1,54 @@
+[
+    {
+        "id": 1,
+        "name": "Mastercard Crédito"
+    },
+    {
+        "id": 2,
+        "name": "Mastercard Débito"
+    },
+    {
+        "id": 3,
+        "name": "Visa Crédito"
+    },
+    {
+        "id": 4,
+        "name": "Visa Débito"
+    },
+    {
+        "id": 5,
+        "name": "Elo Crédito"
+    },
+    {
+        "id": 6,
+        "name": "Elo Débito"
+    },
+    {
+        "id": 7,
+        "name": "Alelo VR - Voucher"
+    },
+    {
+        "id": 8,
+        "name": "Alelo VA - Voucher"
+    },
+    {
+        "id": 9,
+        "name": "Sodexo VR - Voucher"
+    },
+    {
+        "id": 10,
+        "name": "Sodexo VA - Voucher"
+    },
+    {
+        "id": 11,
+        "name": "Dinheiro"
+    },
+    {
+        "id": 12,
+        "name": "Picpay"
+    },
+    {
+        "id": 13,
+        "name": "MercadoPago"
+    }
+]

@@ -1,0 +1,13 @@
+custom:
+  customDomain:
+    domainName: api.cardap.in
+    basePath: ''
+    stage: prd
+    createRoute53Record: true
+    certificateName: '*.cardap.in'
+    securityPolicy: tls_1_2
+    endpointType: 'regional'
+  cors: 'https://cardap.in,https://admin.cardap.in'
+  identitySource: method.request.header.x-cardapin-auth-token
+  authorizerName: authorizer
+  cors-admin: 'https://admin.cardap.in'

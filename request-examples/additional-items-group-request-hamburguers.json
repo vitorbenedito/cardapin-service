@@ -1,0 +1,48 @@
+{
+    "name": "Opcionais de Hamburguer",
+    "description": "Só para os gordoes que so o lanche nao basta",
+    "order": 0,
+    "enabled": true,
+    "minimumItems": 1,    
+	"maximumItems": 10,
+    "additionalItems": [{
+            "name": "Queijo extra",
+            "description": "Queijo mussarela",
+            "price": 100,
+            "enabled": true
+        },
+        {
+            "name": "Presunto extra",
+            "description": "Apresuntado do mais barato",
+            "price": 100,
+            "enabled": true
+        },
+        {
+            "name": "Azeitona",
+            "description": "Azeitona da boa",
+            "price": 100,
+            "enabled": true
+        },
+        {
+            "name": "Arroz e feijão",
+            "description": "Arroz no lanche",
+            "price": 100,
+            "enabled": true
+        },
+        {
+            "name": "Maionese",
+            "description": "Maionese que da liga",
+            "price": 100,
+            "enabled": true
+        },
+        {
+            "name": "Bacon",
+            "description": "Bacon é vida",
+            "price": 100,
+            "enabled": true
+        }
+    ],
+    "company": {
+        "id": 1
+    }
+}

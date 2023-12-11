@@ -1,0 +1,11 @@
+**/main
+**.zip
+api/__debug_bin
+/bin
+.serverless/
+node_modules/
+.DS_Store
+ipackage-lock.json
+**/.DS_Store
+.DS_Store
+.vscode/
