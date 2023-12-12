@@ -28,9 +28,7 @@
                     "price": 30000,
                     "order": 0,
                     "enabled": true,
-                    "image": {
-                        "id": 0
-                    },
+                    "image": "url",
                     "adultsOnly": false,
                     "additionalItemsGroups": [{
                         "id": 1

@@ -89,26 +89,36 @@ func (a *App) initializeRoutes() {
 
 func Login(c *gin.Context) {
 	var userJSON model.UserLoginJSON
-	_ = json.NewDecoder(c.Request.Body).Decode(&userJSON)
+
+	if err := c.ShouldBindJSON(&userJSON); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	userService := &services.UserService{}
 	userResponseJSON, err := userService.Login(userJSON.AsModel())
 	if err != nil {
 		c.Status(http.StatusUnauthorized)
 		return
 	}
-	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	token, _ := auth.CreateToken(userResponseJSON)
-	c.Writer.Header().Add(httphelper.AuthorizationHeader, "Bearer "+token)
-	c.Writer.Header().Add(httphelper.AccessControlExposeHeaders, httphelper.AuthorizationHeader)
+	c.Header(httphelper.AuthorizationHeader, "Bearer "+token)
+	c.Header(httphelper.AccessControlExposeHeaders, httphelper.AuthorizationHeader)
 	c.JSON(http.StatusOK, userResponseJSON)
 }
 
 func CreateUser(c *gin.Context) {
 	var userJSON model.UserRequestJSON
-	_ = json.NewDecoder(c.Request.Body).Decode(&userJSON)
+
+	if err := c.ShouldBindJSON(&userJSON); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	userService := services.UserService{}
 	userResponseJSON, err := userService.SaveUser(userJSON.AsModel())
-	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	httphelper.HandleResponse(userResponseJSON, c.Writer, err)
 }
 
@@ -117,10 +127,15 @@ func generatePresignedUrlToPut(c *gin.Context) {
 		return
 	}
 	var fileJson model.FileRequest
-	_ = json.NewDecoder(c.Request.Body).Decode(&fileJson)
+
+	if err := c.ShouldBindJSON(&fileJson); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	imageService := services.ImageServices{}
 	jsonValue, _ := imageService.GeneratePresignedUrlToPut(fileJson)
-	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	c.JSON(http.StatusOK, jsonValue)
 }
 
@@ -131,7 +146,7 @@ func GetUserById(c *gin.Context) {
 		return
 	}
 	userResponseJSON, _ := userService.GetUserById(c.Param("id"))
-	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	if userResponseJSON.ID == 0 {
 		c.JSON(http.StatusOK, "{}")
 	} else {
@@ -143,15 +158,22 @@ func CreateMenu(c *gin.Context) {
 	if ok := isAuthorized(c); !ok {
 		return
 	}
+
 	var menuJson model.MenuJSON
-	json.NewDecoder(c.Request.Body).Decode(&menuJson)
+
+	if err := c.ShouldBindJSON(&menuJson); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		log.Println("Error:" + err.Error())
+		return
+	}
+
 	menuServices := services.MenuServices{}
 	menuObject := *menuJson.AsModel()
 	if httphelper.HasConflict(&menuObject, c.Writer) {
 		return
 	}
 	menuJSON, err := menuServices.Save(menuObject)
-	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	httphelper.HandleResponse(menuJSON, c.Writer, err)
 }
 
@@ -160,10 +182,15 @@ func CreateCompany(c *gin.Context) {
 		return
 	}
 	var companyJson model.CompanyJson
-	_ = json.NewDecoder(c.Request.Body).Decode(&companyJson)
+
+	if err := c.ShouldBindJSON(&companyJson); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	companyServices := services.CompanyServices{}
 	company, err := companyServices.Save(*companyJson.AsModel())
-	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	companyJSON := company.AsJson()
 	httphelper.HandleResponse(companyJSON, c.Writer, err)
 }
@@ -173,10 +200,15 @@ func UpdateCompany(c *gin.Context) {
 		return
 	}
 	var companyJSONRequest model.CompanyJson
-	_ = json.NewDecoder(c.Request.Body).Decode(&companyJSONRequest)
+
+	if err := c.ShouldBindJSON(&companyJSONRequest); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	companyServices := services.CompanyServices{}
 	company, err := companyServices.Update(*companyJSONRequest.AsModel())
-	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	companyJSON := company.AsJson()
 	httphelper.HandleResponse(companyJSON, c.Writer, err)
 }
@@ -187,7 +219,7 @@ func GetCompany(c *gin.Context) {
 	}
 	companyServices := services.CompanyServices{}
 	company := companyServices.List(c.Param("id"))
-	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	companyJSON := company.AsJson()
 	httphelper.HandleResponse(companyJSON, c.Writer, nil)
 }
@@ -195,14 +227,14 @@ func GetCompany(c *gin.Context) {
 func GetMenuEnabledByCompanyCode(c *gin.Context) {
 	menuServices := services.MenuServices{}
 	menuJSON, err := menuServices.GetMenuEnabledByCompanyCode(c.Param("companyCode"))
-	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	httphelper.HandleResponse(menuJSON, c.Writer, err)
 }
 
 func EnableMenu(c *gin.Context) {
 	menuServices := services.MenuServices{}
 	menuJSON, err := menuServices.EnableMenu(c.Param("id"))
-	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	httphelper.HandleResponse(menuJSON, c.Writer, err)
 }
 
@@ -210,7 +242,7 @@ func GetMenuByLoggedCompany(c *gin.Context) {
 	menuServices := services.MenuServices{}
 
 	menuJSON, err := menuServices.GetMenuByLoggedCompany(httphelper.GetToken(c.Request))
-	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	encodeFunction := func(resp http.ResponseWriter, jsonModel interface{}) {
 		json.NewEncoder(resp).Encode(jsonModel)
 	}
@@ -229,7 +261,7 @@ func UpdateMenu(c *gin.Context) {
 		return
 	}
 	menuResponse, err := menuServices.Update(menuObject)
-	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	httphelper.HandleResponse(menuResponse, c.Writer, err)
 }
 
@@ -249,19 +281,29 @@ func DeleteMenu(c *gin.Context) {
 
 func CreateClient(c *gin.Context) {
 	var client model.Client
-	_ = json.NewDecoder(c.Request.Body).Decode(&client)
+
+	if err := c.ShouldBindJSON(&client); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	clientServices := services.ClientService{}
 	savedClient, _ := clientServices.Save(client, false)
-	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	c.JSON(http.StatusOK, savedClient)
 }
 
 func UpdateClient(c *gin.Context) {
 	var client model.Client
-	_ = json.NewDecoder(c.Request.Body).Decode(&client)
+
+	if err := c.ShouldBindJSON(&client); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	clientServices := services.ClientService{}
 	savedClient, _ := clientServices.Save(client, true)
-	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	c.JSON(http.StatusOK, savedClient)
 }
 
@@ -270,7 +312,7 @@ func GetClientByPhone(c *gin.Context) {
 	clientServices := services.ClientService{}
 	phone, _ := strconv.ParseUint(c.Param("phone"), 10, 64)
 	client, _ := clientServices.GetByPhone(uint64(phone))
-	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	if client.Phone == 0 {
 		c.JSON(http.StatusOK, "{}")
 	} else {
@@ -297,7 +339,7 @@ func GetPaymentTypes(c *gin.Context) {
 	}
 	paymentTypeServices := services.PaymentTypeService{}
 	paymentTypes, err := paymentTypeServices.ListPaymentTypes()
-	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	encodeFunction := func(resp http.ResponseWriter, jsonModel interface{}) {
 		json.NewEncoder(resp).Encode(jsonModel)
 	}
@@ -310,7 +352,7 @@ func GetSections(c *gin.Context) {
 	}
 	sectionService := services.SectionService{}
 	sections, err := sectionService.ListSection()
-	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	encodeFunction := func(resp http.ResponseWriter, jsonModel interface{}) {
 		json.NewEncoder(resp).Encode(jsonModel)
 	}
@@ -322,7 +364,12 @@ func CreateTable(c *gin.Context) {
 		return
 	}
 	var tableJSON model.TableJSON
-	_ = json.NewDecoder(c.Request.Body).Decode(&tableJSON)
+
+	if err := c.ShouldBindJSON(&tableJSON); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	tableServices := services.TableServices{}
 	table := tableJSON.AsModel()
 	if httphelper.HasConflict(table, c.Writer) {
@@ -337,7 +384,12 @@ func UpdateTable(c *gin.Context) {
 		return
 	}
 	var tableJSON model.TableJSON
-	_ = json.NewDecoder(c.Request.Body).Decode(&tableJSON)
+
+	if err := c.ShouldBindJSON(&tableJSON); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	tableServices := services.TableServices{}
 	table := tableJSON.AsModel()
 	savedTable, err := tableServices.Save(*table, true)
@@ -363,7 +415,7 @@ func DeleteTable(c *gin.Context) {
 func ListTable(c *gin.Context) {
 	tableServices := services.TableServices{}
 	tablesJSON, err := tableServices.List(c.Param("id"))
-	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	encodeFunction := func(resp http.ResponseWriter, jsonModel interface{}) {
 		json.NewEncoder(resp).Encode(jsonModel)
 	}
@@ -375,7 +427,12 @@ func CreateAdditionalItemGroup(c *gin.Context) {
 		return
 	}
 	var additionalItemGroupJSON model.AdditionalItemsGroupJSON
-	_ = json.NewDecoder(c.Request.Body).Decode(&additionalItemGroupJSON)
+
+	if err := c.ShouldBindJSON(&additionalItemGroupJSON); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	additionalItemGroup := additionalItemGroupJSON.AsModel()
 	if httphelper.HasConflict(additionalItemGroup, c.Writer) {
 		return
@@ -389,7 +446,12 @@ func UpdateAdditionalItemGroup(c *gin.Context) {
 		return
 	}
 	var additionalItemGroupJSON model.AdditionalItemsGroupJSON
-	_ = json.NewDecoder(c.Request.Body).Decode(&additionalItemGroupJSON)
+
+	if err := c.ShouldBindJSON(&additionalItemGroupJSON); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	additionalItemGroup := additionalItemGroupJSON.AsModel()
 	if httphelper.HasConflict(additionalItemGroup, c.Writer) {
 		return
@@ -401,7 +463,7 @@ func UpdateAdditionalItemGroup(c *gin.Context) {
 func ListAdditionalItemGroup(c *gin.Context) {
 
 	groupsJSON := model.ListAdditionalItemsByCompanyId(c.Param("id"))
-	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	encodeFunction := func(resp http.ResponseWriter, jsonModel interface{}) {
 		json.NewEncoder(resp).Encode(jsonModel)
 	}
@@ -423,7 +485,12 @@ func DeleteAdditionalGroup(c *gin.Context) {
 
 func NewCompanyInterested(c *gin.Context) {
 	var mailInfo email.Email
-	_ = json.NewDecoder(c.Request.Body).Decode(&mailInfo)
+
+	if err := c.ShouldBindJSON(&mailInfo); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	companyServices := services.CompanyServices{}
 	if err := companyServices.CompanyInterested(mailInfo); !err {
 		c.Status(http.StatusInternalServerError)
