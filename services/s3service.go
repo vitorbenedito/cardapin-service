@@ -3,7 +3,7 @@ package services
 import (
 	"time"
 
-	"cardap.in/lambda/awsenvironment"
+	"cardap.in/awsenvironment"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 )

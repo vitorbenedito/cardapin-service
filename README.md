@@ -1,4 +1,3 @@
-# cardap.in Lambda Handlers
+# cardap.in
 
-The cardapin-lambda is an Online Menu solution, developed in Golang, AWS Lambdas, API Gateway and Gin to deploy locally and perform tests, to deploy in AWS we used serverless framework (https://www.serverless.com/framework/docs)
-
+The cardapin is an Online Menu solution, developed in Golang and Gin as http server.

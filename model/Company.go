@@ -3,7 +3,7 @@ package model
 import (
 	"net/url"
 
-	"cardap.in/lambda/awsenvironment"
+	"cardap.in/awsenvironment"
 	"github.com/jinzhu/gorm"
 )
 

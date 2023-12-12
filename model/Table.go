@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strings"
 
-	"cardap.in/lambda/db"
+	"cardap.in/db"
 )
 
 type Table struct {

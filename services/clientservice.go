@@ -1,8 +1,8 @@
 package services
 
 import (
-	"cardap.in/lambda/db"
-	"cardap.in/lambda/model"
+	"cardap.in/db"
+	"cardap.in/model"
 )
 
 type ClientService struct {

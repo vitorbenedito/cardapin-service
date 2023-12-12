@@ -4,8 +4,8 @@ import (
 	"errors"
 	"strconv"
 
-	"cardap.in/lambda/db"
-	"cardap.in/lambda/model"
+	"cardap.in/db"
+	"cardap.in/model"
 )
 
 type TableServices struct {

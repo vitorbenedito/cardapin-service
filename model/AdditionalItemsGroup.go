@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"cardap.in/lambda/db"
+	"cardap.in/db"
 	"github.com/jinzhu/gorm"
 )
 

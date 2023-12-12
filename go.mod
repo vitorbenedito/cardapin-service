@@ -1,8 +1,6 @@
-module cardap.in/lambda
+module cardap.in
 
 go 1.21
-
-require github.com/aws/aws-lambda-go v1.42.0
 
 require github.com/gin-gonic/gin v1.9.1
 

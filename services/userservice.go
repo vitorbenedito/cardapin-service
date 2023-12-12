@@ -3,8 +3,8 @@ package services
 import (
 	"errors"
 
-	"cardap.in/lambda/db"
-	"cardap.in/lambda/model"
+	"cardap.in/db"
+	"cardap.in/model"
 )
 
 type UserService struct {

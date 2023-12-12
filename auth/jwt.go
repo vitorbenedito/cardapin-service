@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"cardap.in/lambda/apperrors"
-	"cardap.in/lambda/model"
+	"cardap.in/apperrors"
+	"cardap.in/model"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/joho/godotenv"
 )

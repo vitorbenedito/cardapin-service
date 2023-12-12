@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"cardap.in/lambda/db"
+	"cardap.in/db"
 )
 
 func main() {

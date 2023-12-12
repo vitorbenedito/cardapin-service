@@ -3,8 +3,8 @@ package migration
 import (
 	"log"
 
-	"cardap.in/lambda/db"
-	"cardap.in/lambda/model"
+	"cardap.in/db"
+	"cardap.in/model"
 	"github.com/jinzhu/gorm"
 	"gopkg.in/gormigrate.v1"
 )

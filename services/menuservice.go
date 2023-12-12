@@ -4,12 +4,12 @@ import (
 	"errors"
 	"strconv"
 
-	"cardap.in/lambda/apperrors"
+	"cardap.in/apperrors"
 
 	"github.com/jinzhu/gorm"
 
-	"cardap.in/lambda/db"
-	"cardap.in/lambda/model"
+	"cardap.in/db"
+	"cardap.in/model"
 )
 
 type MenuServices struct {

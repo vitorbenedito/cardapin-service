@@ -4,12 +4,12 @@ import (
 	"errors"
 	"fmt"
 
-	"cardap.in/lambda/auth"
-	"cardap.in/lambda/db"
-	"cardap.in/lambda/email"
+	"cardap.in/auth"
+	"cardap.in/db"
+	"cardap.in/email"
 
-	"cardap.in/lambda/apperrors"
-	"cardap.in/lambda/model"
+	"cardap.in/apperrors"
+	"cardap.in/model"
 )
 
 type CompanyServices struct {

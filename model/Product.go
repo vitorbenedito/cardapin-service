@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/url"
 
-	"cardap.in/lambda/awsenvironment"
+	"cardap.in/awsenvironment"
 	"github.com/jinzhu/gorm"
 )
 

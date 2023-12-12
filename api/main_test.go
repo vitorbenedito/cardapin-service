@@ -11,8 +11,8 @@ import (
 
 	"github.com/jinzhu/gorm"
 
-	"cardap.in/lambda/db"
-	"cardap.in/lambda/migration"
+	"cardap.in/db"
+	"cardap.in/migration"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/nsf/jsondiff"
 )

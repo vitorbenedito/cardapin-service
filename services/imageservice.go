@@ -7,7 +7,7 @@ import (
 	"time"
 	"unicode"
 
-	"cardap.in/lambda/model"
+	"cardap.in/model"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 )
