@@ -15,7 +15,6 @@ import (
 	"cardap.in/lambda/migration"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/nsf/jsondiff"
-	"github.com/ory/dockertest/v3"
 )
 
 const (
@@ -29,18 +28,11 @@ var a App
 var cleaner func()
 
 func TestMain(m *testing.M) {
-
 	createDatabase()
 	migration.AutoMigrate()
 	a.Initialize()
 	cleaner = dropDatabaseTest(db.DB)
-
 	code := m.Run()
-
-	// if err := pool.Purge(resource); err != nil {
-	// 	log.Fatalf("Could not purge resource: %s", err)
-	// }
-
 	os.Exit(code)
 }
 
@@ -168,10 +160,6 @@ func validate(resp *httptest.ResponseRecorder, t *testing.T, file string) {
 	}
 }
 
-func printResp(resp *httptest.ResponseRecorder) {
-	log.Printf(resp.Body.String())
-}
-
 func executeRequest(req *http.Request) *httptest.ResponseRecorder {
 	rr := httptest.NewRecorder()
 	a.Router.ServeHTTP(rr, req)
@@ -182,37 +170,6 @@ func checkResponseCode(t *testing.T, expected, actual int) {
 	if expected != actual {
 		t.Errorf("Expected response code %d. Got %d\n", expected, actual)
 	}
-}
-
-func createDatabaseTest() (*dockertest.Pool, *dockertest.Resource) {
-	// uses a sensible default on windows (tcp/http) and linux/osx (socket)
-	pool, err := dockertest.NewPool("")
-	if err != nil {
-		log.Fatalf("Could not connect to docker: %s", err)
-	}
-	database := "cardappin"
-	// pulls an image, creates a container based on it and runs it
-	resource, err := pool.Run("postgres", "9.6", []string{"POSTGRES_PASSWORD=test", "POSTGRES_DB=" + database, "POSTGRES_USER=test"})
-	if err != nil {
-		log.Fatalf("Could not start resource: %s", err)
-	}
-
-	// exponential backoff-retry, because the application in the container might not be ready to accept connections yet
-	if err := pool.Retry(func() error {
-		var err error
-		dbURI := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s", "localhost", resource.GetPort("5432/tcp"), "test", database, "test")
-		db2, err := gorm.Open("postgres", dbURI)
-		if err != nil {
-			return err
-		}
-		c := db.Connector{}
-		// db2.LogMode(true)
-		c.InitializeDatabaseParam(db2)
-		return db2.DB().Ping()
-	}); err != nil {
-		log.Fatalf("Could not connect to docker: %s", err)
-	}
-	return pool, resource
 }
 
 func createDatabase() {
