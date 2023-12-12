@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -134,7 +133,7 @@ func TestCreateClients(t *testing.T) {
 func request(method string, endpoint string, file string) *http.Request {
 	var buff *bytes.Buffer
 	if file != "" {
-		content, err := ioutil.ReadFile(file)
+		content, err := os.ReadFile(file)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -159,7 +158,7 @@ func request(method string, endpoint string, file string) *http.Request {
 func validate(resp *httptest.ResponseRecorder, t *testing.T, file string) {
 	opts := jsondiff.DefaultConsoleOptions()
 	body := resp.Body.String()
-	expected, err := ioutil.ReadFile(file)
+	expected, err := os.ReadFile(file)
 	if err != nil {
 		log.Fatal(err)
 	}

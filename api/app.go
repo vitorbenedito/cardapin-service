@@ -15,17 +15,17 @@ import (
 	"cardap.in/lambda/model"
 	"cardap.in/lambda/services"
 
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/rs/cors"
 )
 
 type App struct {
-	Router *mux.Router
+	Router *gin.Engine
 }
 
 func (a *App) Initialize() {
-	a.Router = mux.NewRouter()
+	a.Router = gin.Default()
 
 	a.initializeRoutes()
 }
@@ -49,387 +49,390 @@ func (a *App) Run(addr string) {
 
 func (a *App) initializeRoutes() {
 	//public
-	a.Router.HandleFunc("/login", Login).Methods("POST")
-	a.Router.HandleFunc("/menus/company/{companyCode}/enabled", GetMenuEnabledByCompanyCode).Methods("GET")
+	a.Router.POST("/login", Login)
+	a.Router.GET("/menus/company/:companyCode/enabled", GetMenuEnabledByCompanyCode)
 
-	a.Router.HandleFunc("/users", CreateUser).Methods("POST")
-	a.Router.HandleFunc("/users/{id}", GetUserById).Methods("GET")
-	a.Router.HandleFunc("/menus", CreateMenu).Methods("POST")
-	a.Router.HandleFunc("/menus/{id}", UpdateMenu).Methods("PUT")
+	a.Router.POST("/users", CreateUser)
+	a.Router.GET("/users/:id", GetUserById)
+	a.Router.POST("/menus", CreateMenu)
+	a.Router.PUT("/menus/:id", UpdateMenu)
 
-	a.Router.HandleFunc("/menus/{id}", DeleteMenu).Methods("DELETE")
-	a.Router.HandleFunc("/menus/{id}/enabled", EnableMenu).Methods("PUT")
-	a.Router.HandleFunc("/menus/company", GetMenuByLoggedCompany).Methods("GET")
+	a.Router.DELETE("/menus/:id", DeleteMenu)
+	a.Router.PUT("/menus/:id/enabled", EnableMenu)
+	a.Router.GET("/menus/company", GetMenuByLoggedCompany)
 
-	a.Router.HandleFunc("/tables", CreateTable).Methods("POST")
-	a.Router.HandleFunc("/tables/{id}", UpdateTable).Methods("PUT")
-	a.Router.HandleFunc("/tables/company/{id}", ListTable).Methods("GET")
-	a.Router.HandleFunc("/tables/{id}", DeleteTable).Methods("DELETE")
+	a.Router.POST("/tables", CreateTable)
+	a.Router.PUT("/tables/:id", UpdateTable)
+	a.Router.GET("/tables/company/:id", ListTable)
+	a.Router.DELETE("/tables/:id", DeleteTable)
 
-	a.Router.HandleFunc("/clients", CreateClient).Methods("POST")
-	a.Router.HandleFunc("/clients/{phone}", UpdateClient).Methods("PUT")
-	a.Router.HandleFunc("/clients/{phone}", GetClientByPhone).Methods("GET")
+	a.Router.POST("/clients", CreateClient)
+	a.Router.PUT("/clients/:phone", UpdateClient)
+	a.Router.GET("/clients/:phone", GetClientByPhone)
 
-	a.Router.HandleFunc("/companies/{id}", UpdateCompany).Methods("PUT")
+	a.Router.PUT("/companies/:id", UpdateCompany)
+	a.Router.GET("/companies/:id", GetCompany)
 
-	a.Router.HandleFunc("/images", generatePresignedUrlToPut).Methods("PATCH")
-	a.Router.HandleFunc("/payment-types", GetPaymentTypes).Methods("GET")
-	a.Router.HandleFunc("/sections", GetSections).Methods("GET")
+	a.Router.PATCH("/images", generatePresignedUrlToPut)
+	a.Router.GET("/payment-types", GetPaymentTypes)
+	a.Router.GET("/sections", GetSections)
 
-	a.Router.HandleFunc("/additional-items-groups", CreateAdditionalItemGroup).Methods("POST")
-	a.Router.HandleFunc("/additional-items-groups/{id}", UpdateAdditionalItemGroup).Methods("PUT")
-	a.Router.HandleFunc("/additional-items-groups/company/{id}", ListAdditionalItemGroup).Methods("GET")
-	a.Router.HandleFunc("/additional-items-groups/{id}", DeleteAdditionalGroup).Methods("DELETE")
+	a.Router.POST("/additional-items-groups", CreateAdditionalItemGroup)
+	a.Router.PUT("/additional-items-groups/:id", UpdateAdditionalItemGroup)
+	a.Router.GET("/additional-items-groups/company/:id", ListAdditionalItemGroup)
+	a.Router.DELETE("/additional-items-groups/:id", DeleteAdditionalGroup)
 
-	a.Router.HandleFunc("/companies/{id}", UpdateCompany).Methods("PUT")
+	a.Router.POST("/companies", NewCompanyInterested)
 
-	a.Router.HandleFunc("/companies", NewCompanyInterested).Methods("POST")
-
-	a.Router.HandleFunc("/drop-database", DropDatabase).Methods("GET") //JUST FOR LOCAL ENVIRONMENT
+	a.Router.GET("/drop-database", DropDatabase) //JUST FOR LOCAL ENVIRONMENT
 }
 
-func Login(resp http.ResponseWriter, req *http.Request) {
+func Login(c *gin.Context) {
 	var userJSON model.UserLoginJSON
-	_ = json.NewDecoder(req.Body).Decode(&userJSON)
+	_ = json.NewDecoder(c.Request.Body).Decode(&userJSON)
 	userService := &services.UserService{}
 	userResponseJSON, err := userService.Login(userJSON.AsModel())
 	if err != nil {
-		resp.WriteHeader(http.StatusUnauthorized)
+		c.Status(http.StatusUnauthorized)
 		return
 	}
-	resp.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	token, _ := auth.CreateToken(userResponseJSON)
-	resp.Header().Add(httphelper.AuthorizationHeader, "Bearer "+token)
-	resp.Header().Add(httphelper.AccessControlExposeHeaders, httphelper.AuthorizationHeader)
-	json.NewEncoder(resp).Encode(userResponseJSON)
+	c.Writer.Header().Add(httphelper.AuthorizationHeader, "Bearer "+token)
+	c.Writer.Header().Add(httphelper.AccessControlExposeHeaders, httphelper.AuthorizationHeader)
+	c.JSON(http.StatusOK, userResponseJSON)
 }
 
-func CreateUser(resp http.ResponseWriter, req *http.Request) {
+func CreateUser(c *gin.Context) {
 	var userJSON model.UserRequestJSON
-	_ = json.NewDecoder(req.Body).Decode(&userJSON)
+	_ = json.NewDecoder(c.Request.Body).Decode(&userJSON)
 	userService := services.UserService{}
 	userResponseJSON, err := userService.SaveUser(userJSON.AsModel())
-	resp.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
-	httphelper.HandleResponse(userResponseJSON, resp, err)
+	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	httphelper.HandleResponse(userResponseJSON, c.Writer, err)
 }
 
-func generatePresignedUrlToPut(resp http.ResponseWriter, req *http.Request) {
-	if ok := isAuthorized(resp, req); !ok {
+func generatePresignedUrlToPut(c *gin.Context) {
+	if ok := isAuthorized(c); !ok {
 		return
 	}
 	var fileJson model.FileRequest
-	_ = json.NewDecoder(req.Body).Decode(&fileJson)
+	_ = json.NewDecoder(c.Request.Body).Decode(&fileJson)
 	imageService := services.ImageServices{}
 	jsonValue, _ := imageService.GeneratePresignedUrlToPut(fileJson)
-	resp.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
-	resp.Write([]byte(jsonValue))
+	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.JSON(http.StatusOK, jsonValue)
 }
 
-func GetUserById(resp http.ResponseWriter, req *http.Request) {
-	params := mux.Vars(req)
+func GetUserById(c *gin.Context) {
 	userService := services.UserService{}
-	if _, err := auth.TokenValid(req.Header.Get(httphelper.AuthorizationHeader)); err != nil {
-		resp.WriteHeader(http.StatusUnauthorized)
+	if _, err := auth.TokenValid(c.GetHeader(httphelper.AuthorizationHeader)); err != nil {
+		c.Status(http.StatusUnauthorized)
 		return
 	}
-	userResponseJSON, _ := userService.GetUserById(params["id"])
-	resp.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	userResponseJSON, _ := userService.GetUserById(c.Param("id"))
+	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	if userResponseJSON.ID == 0 {
-		resp.Write([]byte("{}"))
+		c.JSON(http.StatusOK, "{}")
 	} else {
-		json.NewEncoder(resp).Encode(userResponseJSON)
+		c.JSON(http.StatusOK, userResponseJSON)
 	}
 }
 
-func CreateMenu(resp http.ResponseWriter, req *http.Request) {
-	if ok := isAuthorized(resp, req); !ok {
+func CreateMenu(c *gin.Context) {
+	if ok := isAuthorized(c); !ok {
 		return
 	}
 	var menuJson model.MenuJSON
-	json.NewDecoder(req.Body).Decode(&menuJson)
+	json.NewDecoder(c.Request.Body).Decode(&menuJson)
 	menuServices := services.MenuServices{}
 	menuObject := *menuJson.AsModel()
-	if httphelper.HasConflict(&menuObject, resp) {
+	if httphelper.HasConflict(&menuObject, c.Writer) {
 		return
 	}
 	menuJSON, err := menuServices.Save(menuObject)
-	resp.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
-	httphelper.HandleResponse(menuJSON, resp, err)
+	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	httphelper.HandleResponse(menuJSON, c.Writer, err)
 }
 
-func CreateCompany(resp http.ResponseWriter, req *http.Request) {
-	if ok := isAuthorized(resp, req); !ok {
+func CreateCompany(c *gin.Context) {
+	if ok := isAuthorized(c); !ok {
 		return
 	}
 	var companyJson model.CompanyJson
-	_ = json.NewDecoder(req.Body).Decode(&companyJson)
+	_ = json.NewDecoder(c.Request.Body).Decode(&companyJson)
 	companyServices := services.CompanyServices{}
 	company, err := companyServices.Save(*companyJson.AsModel())
-	resp.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	companyJSON := company.AsJson()
-	httphelper.HandleResponse(companyJSON, resp, err)
+	httphelper.HandleResponse(companyJSON, c.Writer, err)
 }
 
-func UpdateCompany(resp http.ResponseWriter, req *http.Request) {
-	if ok := isAuthorized(resp, req); !ok {
+func UpdateCompany(c *gin.Context) {
+	if ok := isAuthorized(c); !ok {
 		return
 	}
 	var companyJSONRequest model.CompanyJson
-	_ = json.NewDecoder(req.Body).Decode(&companyJSONRequest)
+	_ = json.NewDecoder(c.Request.Body).Decode(&companyJSONRequest)
 	companyServices := services.CompanyServices{}
 	company, err := companyServices.Update(*companyJSONRequest.AsModel())
-	resp.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	companyJSON := company.AsJson()
-	httphelper.HandleResponse(companyJSON, resp, err)
+	httphelper.HandleResponse(companyJSON, c.Writer, err)
 }
 
-func GetMenuEnabledByCompanyCode(resp http.ResponseWriter, req *http.Request) {
-	params := mux.Vars(req)
-	menuServices := services.MenuServices{}
-	menuJSON, err := menuServices.GetMenuEnabledByCompanyCode(params["companyCode"])
-	resp.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
-	httphelper.HandleResponse(menuJSON, resp, err)
+func GetCompany(c *gin.Context) {
+	if ok := isAuthorized(c); !ok {
+		return
+	}
+	companyServices := services.CompanyServices{}
+	company := companyServices.List(c.Param("id"))
+	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	companyJSON := company.AsJson()
+	httphelper.HandleResponse(companyJSON, c.Writer, nil)
 }
 
-func EnableMenu(resp http.ResponseWriter, req *http.Request) {
-	params := mux.Vars(req)
+func GetMenuEnabledByCompanyCode(c *gin.Context) {
 	menuServices := services.MenuServices{}
-	menuJSON, err := menuServices.EnableMenu(params["id"])
-	resp.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
-	httphelper.HandleResponse(menuJSON, resp, err)
+	menuJSON, err := menuServices.GetMenuEnabledByCompanyCode(c.Param("companyCode"))
+	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	httphelper.HandleResponse(menuJSON, c.Writer, err)
 }
 
-func GetMenuByLoggedCompany(resp http.ResponseWriter, req *http.Request) {
+func EnableMenu(c *gin.Context) {
+	menuServices := services.MenuServices{}
+	menuJSON, err := menuServices.EnableMenu(c.Param("id"))
+	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	httphelper.HandleResponse(menuJSON, c.Writer, err)
+}
+
+func GetMenuByLoggedCompany(c *gin.Context) {
 	menuServices := services.MenuServices{}
 
-	menuJSON, err := menuServices.GetMenuByLoggedCompany(httphelper.GetToken(req))
-	resp.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	menuJSON, err := menuServices.GetMenuByLoggedCompany(httphelper.GetToken(c.Request))
+	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	encodeFunction := func(resp http.ResponseWriter, jsonModel interface{}) {
 		json.NewEncoder(resp).Encode(jsonModel)
 	}
-	httphelper.HandleEmptySliceResp(len(menuJSON), resp, encodeFunction, menuJSON, err)
+	httphelper.HandleEmptySliceResp(len(menuJSON), c.Writer, encodeFunction, menuJSON, err)
 }
 
-func UpdateMenu(resp http.ResponseWriter, req *http.Request) {
-	if ok := isAuthorized(resp, req); !ok {
+func UpdateMenu(c *gin.Context) {
+	if ok := isAuthorized(c); !ok {
 		return
 	}
 	var menuJSON model.MenuJSON
-	_ = json.NewDecoder(req.Body).Decode(&menuJSON)
+	_ = json.NewDecoder(c.Request.Body).Decode(&menuJSON)
 	menuServices := services.MenuServices{}
 	menuObject := *menuJSON.AsModel()
-	if httphelper.HasConflict(&menuObject, resp) {
+	if httphelper.HasConflict(&menuObject, c.Writer) {
 		return
 	}
 	menuResponse, err := menuServices.Update(menuObject)
-	resp.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
-	httphelper.HandleResponse(menuResponse, resp, err)
+	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	httphelper.HandleResponse(menuResponse, c.Writer, err)
 }
 
-func DeleteMenu(resp http.ResponseWriter, req *http.Request) {
-	if ok := isAuthorized(resp, req); !ok {
+func DeleteMenu(c *gin.Context) {
+	if ok := isAuthorized(c); !ok {
 		return
 	}
 	var menuJSON model.MenuJSON
-	_ = json.NewDecoder(req.Body).Decode(&menuJSON)
+	_ = json.NewDecoder(c.Request.Body).Decode(&menuJSON)
 	menuServices := services.MenuServices{}
-	if _, err := menuServices.DeleteMenu(mux.Vars(req)["id"]); err != nil {
-		resp.WriteHeader(http.StatusInternalServerError)
-		resp.Write([]byte("{ \"message\": \"" + err.Error() + "\"}"))
+	if _, err := menuServices.DeleteMenu(c.Param("id")); err != nil {
+		c.JSON(http.StatusInternalServerError, "{ \"message\": \""+err.Error()+"\"}")
 		return
 	}
-	resp.WriteHeader(http.StatusNoContent)
+	c.Status(http.StatusNoContent)
 }
 
-func CreateClient(resp http.ResponseWriter, req *http.Request) {
+func CreateClient(c *gin.Context) {
 	var client model.Client
-	_ = json.NewDecoder(req.Body).Decode(&client)
+	_ = json.NewDecoder(c.Request.Body).Decode(&client)
 	clientServices := services.ClientService{}
 	savedClient, _ := clientServices.Save(client, false)
-	resp.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
-	json.NewEncoder(resp).Encode(savedClient)
+	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.JSON(http.StatusOK, savedClient)
 }
 
-func UpdateClient(resp http.ResponseWriter, req *http.Request) {
+func UpdateClient(c *gin.Context) {
 	var client model.Client
-	_ = json.NewDecoder(req.Body).Decode(&client)
+	_ = json.NewDecoder(c.Request.Body).Decode(&client)
 	clientServices := services.ClientService{}
 	savedClient, _ := clientServices.Save(client, true)
-	resp.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
-	json.NewEncoder(resp).Encode(savedClient)
+	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.JSON(http.StatusOK, savedClient)
 }
 
-func GetClientByPhone(resp http.ResponseWriter, req *http.Request) {
-	params := mux.Vars(req)
+func GetClientByPhone(c *gin.Context) {
+
 	clientServices := services.ClientService{}
-	phone, _ := strconv.ParseUint(params["phone"], 10, 64)
+	phone, _ := strconv.ParseUint(c.Param("phone"), 10, 64)
 	client, _ := clientServices.GetByPhone(uint64(phone))
-	resp.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	if client.Phone == 0 {
-		resp.Write([]byte("{}"))
+		c.JSON(http.StatusOK, "{}")
 	} else {
-		json.NewEncoder(resp).Encode(client)
+		c.JSON(http.StatusOK, client)
 	}
 }
 
-func isAuthorized(resp http.ResponseWriter, req *http.Request) bool {
+func isAuthorized(c *gin.Context) bool {
 	godotenv.Load()
 	disableAuth := os.Getenv("disable_auth")
 	if disableAuth == "true" {
 		return true
 	}
-	if _, err := auth.TokenValid(req.Header.Get(httphelper.AuthorizationHeader)); err != nil {
-		resp.WriteHeader(http.StatusUnauthorized)
+	if _, err := auth.TokenValid(c.Request.Header.Get(httphelper.AuthorizationHeader)); err != nil {
+		c.Status(http.StatusUnauthorized)
 		return false
 	}
 	return true
 }
 
-func GetPaymentTypes(resp http.ResponseWriter, req *http.Request) {
-	if ok := isAuthorized(resp, req); !ok {
+func GetPaymentTypes(c *gin.Context) {
+	if ok := isAuthorized(c); !ok {
 		return
 	}
 	paymentTypeServices := services.PaymentTypeService{}
 	paymentTypes, err := paymentTypeServices.ListPaymentTypes()
-	resp.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	encodeFunction := func(resp http.ResponseWriter, jsonModel interface{}) {
 		json.NewEncoder(resp).Encode(jsonModel)
 	}
-	httphelper.HandleEmptySliceResponse(len(paymentTypes), resp, encodeFunction, paymentTypes, err)
+	httphelper.HandleEmptySliceResponse(len(paymentTypes), c.Writer, encodeFunction, paymentTypes, err)
 }
 
-func GetSections(resp http.ResponseWriter, req *http.Request) {
-	if ok := isAuthorized(resp, req); !ok {
+func GetSections(c *gin.Context) {
+	if ok := isAuthorized(c); !ok {
 		return
 	}
 	sectionService := services.SectionService{}
 	sections, err := sectionService.ListSection()
-	resp.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	encodeFunction := func(resp http.ResponseWriter, jsonModel interface{}) {
 		json.NewEncoder(resp).Encode(jsonModel)
 	}
-	httphelper.HandleEmptySliceResponse(len(sections), resp, encodeFunction, sections, err)
+	httphelper.HandleEmptySliceResponse(len(sections), c.Writer, encodeFunction, sections, err)
 }
 
-func CreateTable(resp http.ResponseWriter, req *http.Request) {
-	if ok := isAuthorized(resp, req); !ok {
+func CreateTable(c *gin.Context) {
+	if ok := isAuthorized(c); !ok {
 		return
 	}
 	var tableJSON model.TableJSON
-	_ = json.NewDecoder(req.Body).Decode(&tableJSON)
+	_ = json.NewDecoder(c.Request.Body).Decode(&tableJSON)
 	tableServices := services.TableServices{}
 	table := tableJSON.AsModel()
-	if httphelper.HasConflict(table, resp) {
+	if httphelper.HasConflict(table, c.Writer) {
 		return
 	}
 	savedTable, err := tableServices.Save(*table, false)
-	httphelper.HandleResponse(savedTable.AsJSON(), resp, err)
+	httphelper.HandleResponse(savedTable.AsJSON(), c.Writer, err)
 }
 
-func UpdateTable(resp http.ResponseWriter, req *http.Request) {
-	if ok := isAuthorized(resp, req); !ok {
+func UpdateTable(c *gin.Context) {
+	if ok := isAuthorized(c); !ok {
 		return
 	}
 	var tableJSON model.TableJSON
-	_ = json.NewDecoder(req.Body).Decode(&tableJSON)
+	_ = json.NewDecoder(c.Request.Body).Decode(&tableJSON)
 	tableServices := services.TableServices{}
 	table := tableJSON.AsModel()
 	savedTable, err := tableServices.Save(*table, true)
 	if err != nil {
-		httphelper.HandleResponse(nil, resp, err)
+		httphelper.HandleResponse(nil, c.Writer, err)
 		return
 	}
-	httphelper.HandleResponse(savedTable.AsJSON(), resp, err)
+	httphelper.HandleResponse(savedTable.AsJSON(), c.Writer, err)
 }
 
-func DeleteTable(resp http.ResponseWriter, req *http.Request) {
-	if ok := isAuthorized(resp, req); !ok {
+func DeleteTable(c *gin.Context) {
+	if ok := isAuthorized(c); !ok {
 		return
 	}
 	tableServices := services.TableServices{}
-	if _, err := tableServices.Delete(mux.Vars(req)["id"]); err != nil {
-		resp.WriteHeader(http.StatusInternalServerError)
-		resp.Write([]byte("{ \"message\": \"" + err.Error() + "\"}"))
+	if _, err := tableServices.Delete(c.Param("id")); err != nil {
+		c.JSON(http.StatusInternalServerError, "{ \"message\": \""+err.Error()+"\"}")
 		return
 	}
-	resp.WriteHeader(http.StatusNoContent)
+	c.Status(http.StatusNoContent)
 }
 
-func ListTable(resp http.ResponseWriter, req *http.Request) {
-	params := mux.Vars(req)
+func ListTable(c *gin.Context) {
 	tableServices := services.TableServices{}
-	tablesJSON, err := tableServices.List(params["id"])
-	resp.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+	tablesJSON, err := tableServices.List(c.Param("id"))
+	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	encodeFunction := func(resp http.ResponseWriter, jsonModel interface{}) {
 		json.NewEncoder(resp).Encode(jsonModel)
 	}
-	httphelper.HandleEmptySliceResponse(len(tablesJSON), resp, encodeFunction, tablesJSON, err)
+	httphelper.HandleEmptySliceResponse(len(tablesJSON), c.Writer, encodeFunction, tablesJSON, err)
 }
 
-func CreateAdditionalItemGroup(resp http.ResponseWriter, req *http.Request) {
-	if ok := isAuthorized(resp, req); !ok {
+func CreateAdditionalItemGroup(c *gin.Context) {
+	if ok := isAuthorized(c); !ok {
 		return
 	}
 	var additionalItemGroupJSON model.AdditionalItemsGroupJSON
-	_ = json.NewDecoder(req.Body).Decode(&additionalItemGroupJSON)
+	_ = json.NewDecoder(c.Request.Body).Decode(&additionalItemGroupJSON)
 	additionalItemGroup := additionalItemGroupJSON.AsModel()
-	if httphelper.HasConflict(additionalItemGroup, resp) {
+	if httphelper.HasConflict(additionalItemGroup, c.Writer) {
 		return
 	}
 	savedGroup, err := model.SaveAdditionalItemsGroup(*additionalItemGroup)
-	httphelper.HandleResponse(savedGroup.AsJSON(), resp, err)
+	httphelper.HandleResponse(savedGroup.AsJSON(), c.Writer, err)
 }
 
-func UpdateAdditionalItemGroup(resp http.ResponseWriter, req *http.Request) {
-	if ok := isAuthorized(resp, req); !ok {
+func UpdateAdditionalItemGroup(c *gin.Context) {
+	if ok := isAuthorized(c); !ok {
 		return
 	}
 	var additionalItemGroupJSON model.AdditionalItemsGroupJSON
-	_ = json.NewDecoder(req.Body).Decode(&additionalItemGroupJSON)
+	_ = json.NewDecoder(c.Request.Body).Decode(&additionalItemGroupJSON)
 	additionalItemGroup := additionalItemGroupJSON.AsModel()
-	if httphelper.HasConflict(additionalItemGroup, resp) {
+	if httphelper.HasConflict(additionalItemGroup, c.Writer) {
 		return
 	}
 	savedGroup, err := model.UpdateAdditionalItemsGroup(*additionalItemGroup)
-	httphelper.HandleResponse(savedGroup.AsJSON(), resp, err)
+	httphelper.HandleResponse(savedGroup.AsJSON(), c.Writer, err)
 }
 
-func ListAdditionalItemGroup(resp http.ResponseWriter, req *http.Request) {
-	params := mux.Vars(req)
-	groupsJSON := model.ListAdditionalItemsByCompanyId(params["id"])
-	resp.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
+func ListAdditionalItemGroup(c *gin.Context) {
+
+	groupsJSON := model.ListAdditionalItemsByCompanyId(c.Param("id"))
+	c.Writer.Header().Add(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	encodeFunction := func(resp http.ResponseWriter, jsonModel interface{}) {
 		json.NewEncoder(resp).Encode(jsonModel)
 	}
-	httphelper.HandleEmptySliceResponse(len(groupsJSON), resp, encodeFunction, groupsJSON, nil)
+	httphelper.HandleEmptySliceResponse(len(groupsJSON), c.Writer, encodeFunction, groupsJSON, nil)
 }
 
-func DeleteAdditionalGroup(resp http.ResponseWriter, req *http.Request) {
-	if ok := isAuthorized(resp, req); !ok {
+func DeleteAdditionalGroup(c *gin.Context) {
+	if ok := isAuthorized(c); !ok {
 		return
 	}
-	params := mux.Vars(req)
-	err := model.DeleteAdditionalGroup(params["id"])
+
+	err := model.DeleteAdditionalGroup(c.Param("id"))
 	if err != nil {
-		resp.WriteHeader(http.StatusInternalServerError)
-		resp.Write([]byte("{ \"message\": \"" + err.Error() + "\"}"))
+		c.JSON(http.StatusInternalServerError, "{ \"message\": \""+err.Error()+"\"}")
 		return
 	}
-	resp.WriteHeader(http.StatusNoContent)
+	c.Status(http.StatusNoContent)
 }
 
-func NewCompanyInterested(resp http.ResponseWriter, req *http.Request) {
+func NewCompanyInterested(c *gin.Context) {
 	var mailInfo email.Email
-	_ = json.NewDecoder(req.Body).Decode(&mailInfo)
+	_ = json.NewDecoder(c.Request.Body).Decode(&mailInfo)
 	companyServices := services.CompanyServices{}
 	if err := companyServices.CompanyInterested(mailInfo); !err {
-		resp.WriteHeader(http.StatusInternalServerError)
+		c.Status(http.StatusInternalServerError)
 		return
 	}
-	resp.WriteHeader(http.StatusOK)
+	c.Status(http.StatusOK)
 }
 
-func DropDatabase(resp http.ResponseWriter, req *http.Request) {
+func DropDatabase(c *gin.Context) {
 	db.DB.Exec("drop schema public cascade")
 	db.DB.Exec("create schema public")
 	migration.AutoMigrate()
