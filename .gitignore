@@ -9,4 +9,3 @@ ipackage-lock.json
 **/.DS_Store
 .DS_Store
 .vscode/
-go.sum
