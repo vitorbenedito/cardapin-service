@@ -8,10 +8,10 @@ import (
 )
 
 type Table struct {
-	ID        uint     `gorm:"primary_key; type:serial; not null;"`
-	Name      string   `gorm:"type:varchar(255); not null;"`
-	CompanyID uint     `gorm:"type:bigint; not null;"`
-	Company   *Company `gorm:"foreignkey:CompanyID"`
+	ID        uint   `gorm:"primary_key; type:serial; not null;"`
+	Name      string `gorm:"type:varchar(255); not null;"`
+	CompanyID uint   `gorm:"type:bigint; not null;"`
+	Company   *Company
 }
 
 type TableJSON struct {

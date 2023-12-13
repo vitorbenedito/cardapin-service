@@ -9,12 +9,12 @@ import (
 	"os"
 	"testing"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 
 	"cardap.in/db"
 	"cardap.in/migration"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/nsf/jsondiff"
+	"gorm.io/driver/postgres"
 )
 
 const (
@@ -178,8 +178,10 @@ func createDatabase() {
 	database := "cardappin"
 	// pulls an image, creates a container based on it and runs it
 	var err error
-	dbURI := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s", "localhost", "5433", "test", database, "test")
-	db2, err := gorm.Open("postgres", dbURI)
+	dsn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s", "localhost", "5433", "test", database, "test")
+	db2, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		DisableForeignKeyConstraintWhenMigrating: true,
+	})
 	if err != nil {
 		log.Fatalf("Error to open connection: %s", err)
 	}

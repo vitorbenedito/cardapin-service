@@ -6,7 +6,7 @@ import (
 
 	"cardap.in/apperrors"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 
 	"cardap.in/db"
 	"cardap.in/model"
@@ -16,9 +16,8 @@ type MenuServices struct {
 }
 
 func (ms *MenuServices) Save(menuToSave model.Menu) (model.MenuJSON, error) {
-	if !db.DB.NewRecord(&menuToSave) {
-		return ms.Update(menuToSave)
-	}
+	db.DB.Create(&menuToSave)
+
 	companyServices := CompanyServices{}
 	companyID := strconv.FormatUint(uint64(menuToSave.CompanyID), 10)
 	menuToSave.Company = companyServices.List(companyID)

@@ -1,7 +1,6 @@
 package services
 
 import (
-	"errors"
 	"strconv"
 
 	"cardap.in/db"
@@ -12,8 +11,8 @@ type TableServices struct {
 }
 
 func (t *TableServices) Save(tableToSave model.Table, isUpdate bool) (*model.Table, error) {
-	if !isUpdate && !db.DB.NewRecord(&tableToSave) {
-		return nil, errors.New("Could not update a request with a POST")
+	if !isUpdate {
+		db.DB.Create(&tableToSave)
 	}
 
 	companyServices := CompanyServices{}

@@ -4,7 +4,7 @@ import (
 	"net/url"
 
 	"cardap.in/awsenvironment"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type Company struct {

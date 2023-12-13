@@ -4,7 +4,7 @@ import (
 	"crypto/md5"
 	"fmt"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 const (
@@ -18,7 +18,7 @@ type User struct {
 	Email     string   `gorm:"type:varchar(255); not null;"`
 	Password  string   `gorm:"type:varchar(255); not null;"`
 	CompanyID uint     `gorm:"type:bigint;"`
-	Company   *Company `gorm:"foreignkey:CompanyID"`
+	Company   *Company `gorm:"foreignKey:CompanyID"`
 }
 
 type UserRequestJSON struct {

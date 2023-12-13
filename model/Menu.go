@@ -3,16 +3,16 @@ package model
 import (
 	"errors"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type Menu struct {
 	gorm.Model
-	Description  string  `gorm:"type:varchar(255);"`
-	Enabled      bool    `gorm:"type:boolean;"`
-	MinimumOrder int64   `gorm:"type:bigint;"`
-	CompanyID    uint    `gorm:"type:bigint;"`
-	Company      Company `gorm:"foreignkey:CompanyID"`
+	Description  string `gorm:"type:varchar(255);"`
+	Enabled      bool   `gorm:"type:boolean;"`
+	MinimumOrder int64  `gorm:"type:bigint;"`
+	CompanyID    uint   `gorm:"type:bigint;"`
+	Company      Company
 	Categories   []*Category
 }
 

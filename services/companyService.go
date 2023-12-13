@@ -16,9 +16,8 @@ type CompanyServices struct {
 }
 
 func (c *CompanyServices) Save(companyToSave model.Company) (model.Company, error) {
-	if !db.DB.NewRecord(&companyToSave) {
-		return model.Company{}, errors.New("Could not update a request with a POST")
-	}
+	db.DB.Create(&companyToSave)
+
 	if c.CompanyCodeExists(companyToSave) {
 		return model.Company{}, errors.New("Company code with name " + companyToSave.CompanyCode + " already exists")
 	}

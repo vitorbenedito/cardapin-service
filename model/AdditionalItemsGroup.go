@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"cardap.in/db"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type AdditionalItemsGroup struct {
@@ -86,9 +86,8 @@ func (g AdditionalItemsGroupJSON) GetId() uint {
 }
 
 func SaveAdditionalItemsGroup(groupToSave AdditionalItemsGroup) (AdditionalItemsGroup, error) {
-	if !db.DB.NewRecord(&groupToSave) {
-		return AdditionalItemsGroup{}, errors.New("Could not update a request with a POST")
-	}
+	db.DB.Create(&groupToSave)
+
 	if additionalItemsGroupExists(groupToSave) {
 		return AdditionalItemsGroup{}, errors.New("Group with name " + groupToSave.Name + " already exists")
 	}

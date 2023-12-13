@@ -5,9 +5,10 @@ import (
 	"log"
 	"os"
 
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/joho/godotenv"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 var DB *gorm.DB
@@ -21,7 +22,7 @@ type Connector struct {
 func (p *PostgresConnector) InitializeDatabase() {
 	var err error
 	DB, err = p.getConnection()
-	DB.LogMode(true)
+	DB.Logger.LogMode(logger.Info)
 	if err != nil {
 		log.Printf("Error to get database connection: " + err.Error())
 	}
@@ -49,8 +50,8 @@ func (p *PostgresConnector) getConnection() (db *gorm.DB, err error) {
 	if dbPort == "" {
 		dbPort = "5432"
 	}
-	dbURI := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s", dbHost, dbPort, username, dbName, password)
-	db2, err := gorm.Open("postgres", dbURI)
+	dsn := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s", dbHost, dbPort, username, dbName, password)
+	db2, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}
