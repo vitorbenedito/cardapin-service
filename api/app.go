@@ -119,7 +119,7 @@ func CreateUser(c *gin.Context) {
 	userService := services.UserService{}
 	userResponseJSON, err := userService.SaveUser(userJSON.AsModel())
 	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
-	httphelper.HandleResponse(userResponseJSON, c.Writer, err)
+	httphelper.HandleResponse(userResponseJSON, c, err)
 }
 
 func generatePresignedUrlToPut(c *gin.Context) {
@@ -148,7 +148,8 @@ func GetUserById(c *gin.Context) {
 	userResponseJSON, _ := userService.GetUserById(c.Param("id"))
 	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	if userResponseJSON.ID == 0 {
-		c.JSON(http.StatusOK, "{}")
+		c.Writer.WriteHeader(http.StatusNotFound)
+		c.Writer.Write([]byte("{}"))
 	} else {
 		c.JSON(http.StatusOK, userResponseJSON)
 	}
@@ -169,12 +170,12 @@ func CreateMenu(c *gin.Context) {
 
 	menuServices := services.MenuServices{}
 	menuObject := *menuJson.AsModel()
-	if httphelper.HasConflict(&menuObject, c.Writer) {
+	if httphelper.HasConflict(&menuObject, c) {
 		return
 	}
 	menuJSON, err := menuServices.Save(menuObject)
 	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
-	httphelper.HandleResponse(menuJSON, c.Writer, err)
+	httphelper.HandleResponse(menuJSON, c, err)
 }
 
 func CreateCompany(c *gin.Context) {
@@ -192,7 +193,7 @@ func CreateCompany(c *gin.Context) {
 	company, err := companyServices.Save(*companyJson.AsModel())
 	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	companyJSON := company.AsJson()
-	httphelper.HandleResponse(companyJSON, c.Writer, err)
+	httphelper.HandleResponse(companyJSON, c, err)
 }
 
 func UpdateCompany(c *gin.Context) {
@@ -210,7 +211,7 @@ func UpdateCompany(c *gin.Context) {
 	company, err := companyServices.Update(*companyJSONRequest.AsModel())
 	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	companyJSON := company.AsJson()
-	httphelper.HandleResponse(companyJSON, c.Writer, err)
+	httphelper.HandleResponse(companyJSON, c, err)
 }
 
 func GetCompany(c *gin.Context) {
@@ -221,32 +222,28 @@ func GetCompany(c *gin.Context) {
 	company := companyServices.List(c.Param("id"))
 	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	companyJSON := company.AsJson()
-	httphelper.HandleResponse(companyJSON, c.Writer, nil)
+	httphelper.HandleResponse(companyJSON, c, nil)
 }
 
 func GetMenuEnabledByCompanyCode(c *gin.Context) {
 	menuServices := services.MenuServices{}
 	menuJSON, err := menuServices.GetMenuEnabledByCompanyCode(c.Param("companyCode"))
 	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
-	httphelper.HandleResponse(menuJSON, c.Writer, err)
+	httphelper.HandleResponse(menuJSON, c, err)
 }
 
 func EnableMenu(c *gin.Context) {
 	menuServices := services.MenuServices{}
 	menuJSON, err := menuServices.EnableMenu(c.Param("id"))
 	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
-	httphelper.HandleResponse(menuJSON, c.Writer, err)
+	httphelper.HandleResponse(menuJSON, c, err)
 }
 
 func GetMenuByLoggedCompany(c *gin.Context) {
 	menuServices := services.MenuServices{}
-
 	menuJSON, err := menuServices.GetMenuByLoggedCompany(httphelper.GetToken(c.Request))
 	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
-	encodeFunction := func(resp http.ResponseWriter, jsonModel interface{}) {
-		json.NewEncoder(resp).Encode(jsonModel)
-	}
-	httphelper.HandleEmptySliceResp(len(menuJSON), c.Writer, encodeFunction, menuJSON, err)
+	httphelper.HandleEmptySliceResp(len(menuJSON), c, menuJSON, err)
 }
 
 func UpdateMenu(c *gin.Context) {
@@ -257,12 +254,12 @@ func UpdateMenu(c *gin.Context) {
 	_ = json.NewDecoder(c.Request.Body).Decode(&menuJSON)
 	menuServices := services.MenuServices{}
 	menuObject := *menuJSON.AsModel()
-	if httphelper.HasConflict(&menuObject, c.Writer) {
+	if httphelper.HasConflict(&menuObject, c) {
 		return
 	}
 	menuResponse, err := menuServices.Update(menuObject)
 	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
-	httphelper.HandleResponse(menuResponse, c.Writer, err)
+	httphelper.HandleResponse(menuResponse, c, err)
 }
 
 func DeleteMenu(c *gin.Context) {
@@ -314,7 +311,8 @@ func GetClientByPhone(c *gin.Context) {
 	client, _ := clientServices.GetByPhone(uint64(phone))
 	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
 	if client.Phone == 0 {
-		c.JSON(http.StatusOK, "{}")
+		c.Writer.WriteHeader(http.StatusNotFound)
+		c.Writer.Write([]byte("{}"))
 	} else {
 		c.JSON(http.StatusOK, client)
 	}
@@ -340,10 +338,8 @@ func GetPaymentTypes(c *gin.Context) {
 	paymentTypeServices := services.PaymentTypeService{}
 	paymentTypes, err := paymentTypeServices.ListPaymentTypes()
 	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
-	encodeFunction := func(resp http.ResponseWriter, jsonModel interface{}) {
-		json.NewEncoder(resp).Encode(jsonModel)
-	}
-	httphelper.HandleEmptySliceResponse(len(paymentTypes), c.Writer, encodeFunction, paymentTypes, err)
+
+	httphelper.HandleEmptySliceResponse(len(paymentTypes), c, paymentTypes, err)
 }
 
 func GetSections(c *gin.Context) {
@@ -353,10 +349,7 @@ func GetSections(c *gin.Context) {
 	sectionService := services.SectionService{}
 	sections, err := sectionService.ListSection()
 	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
-	encodeFunction := func(resp http.ResponseWriter, jsonModel interface{}) {
-		json.NewEncoder(resp).Encode(jsonModel)
-	}
-	httphelper.HandleEmptySliceResponse(len(sections), c.Writer, encodeFunction, sections, err)
+	httphelper.HandleEmptySliceResponse(len(sections), c, sections, err)
 }
 
 func CreateTable(c *gin.Context) {
@@ -372,11 +365,11 @@ func CreateTable(c *gin.Context) {
 
 	tableServices := services.TableServices{}
 	table := tableJSON.AsModel()
-	if httphelper.HasConflict(table, c.Writer) {
+	if httphelper.HasConflict(table, c) {
 		return
 	}
 	savedTable, err := tableServices.Save(*table, false)
-	httphelper.HandleResponse(savedTable.AsJSON(), c.Writer, err)
+	httphelper.HandleResponse(savedTable.AsJSON(), c, err)
 }
 
 func UpdateTable(c *gin.Context) {
@@ -394,10 +387,10 @@ func UpdateTable(c *gin.Context) {
 	table := tableJSON.AsModel()
 	savedTable, err := tableServices.Save(*table, true)
 	if err != nil {
-		httphelper.HandleResponse(nil, c.Writer, err)
+		httphelper.HandleResponse(nil, c, err)
 		return
 	}
-	httphelper.HandleResponse(savedTable.AsJSON(), c.Writer, err)
+	httphelper.HandleResponse(savedTable.AsJSON(), c, err)
 }
 
 func DeleteTable(c *gin.Context) {
@@ -416,10 +409,7 @@ func ListTable(c *gin.Context) {
 	tableServices := services.TableServices{}
 	tablesJSON, err := tableServices.List(c.Param("id"))
 	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
-	encodeFunction := func(resp http.ResponseWriter, jsonModel interface{}) {
-		json.NewEncoder(resp).Encode(jsonModel)
-	}
-	httphelper.HandleEmptySliceResponse(len(tablesJSON), c.Writer, encodeFunction, tablesJSON, err)
+	httphelper.HandleEmptySliceResponse(len(tablesJSON), c, tablesJSON, err)
 }
 
 func CreateAdditionalItemGroup(c *gin.Context) {
@@ -434,11 +424,11 @@ func CreateAdditionalItemGroup(c *gin.Context) {
 	}
 
 	additionalItemGroup := additionalItemGroupJSON.AsModel()
-	if httphelper.HasConflict(additionalItemGroup, c.Writer) {
+	if httphelper.HasConflict(additionalItemGroup, c) {
 		return
 	}
 	savedGroup, err := model.SaveAdditionalItemsGroup(*additionalItemGroup)
-	httphelper.HandleResponse(savedGroup.AsJSON(), c.Writer, err)
+	httphelper.HandleResponse(savedGroup.AsJSON(), c, err)
 }
 
 func UpdateAdditionalItemGroup(c *gin.Context) {
@@ -453,21 +443,18 @@ func UpdateAdditionalItemGroup(c *gin.Context) {
 	}
 
 	additionalItemGroup := additionalItemGroupJSON.AsModel()
-	if httphelper.HasConflict(additionalItemGroup, c.Writer) {
+	if httphelper.HasConflict(additionalItemGroup, c) {
 		return
 	}
 	savedGroup, err := model.UpdateAdditionalItemsGroup(*additionalItemGroup)
-	httphelper.HandleResponse(savedGroup.AsJSON(), c.Writer, err)
+	httphelper.HandleResponse(savedGroup.AsJSON(), c, err)
 }
 
 func ListAdditionalItemGroup(c *gin.Context) {
 
 	groupsJSON := model.ListAdditionalItemsByCompanyId(c.Param("id"))
 	c.Header(httphelper.ContentTypeHeader, httphelper.ApplicationJSONValue)
-	encodeFunction := func(resp http.ResponseWriter, jsonModel interface{}) {
-		json.NewEncoder(resp).Encode(jsonModel)
-	}
-	httphelper.HandleEmptySliceResponse(len(groupsJSON), c.Writer, encodeFunction, groupsJSON, nil)
+	httphelper.HandleEmptySliceResponse(len(groupsJSON), c, groupsJSON, nil)
 }
 
 func DeleteAdditionalGroup(c *gin.Context) {

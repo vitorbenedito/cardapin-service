@@ -1,9 +1,10 @@
 package httphelper
 
 import (
-	"encoding/json"
 	"net/http"
 	"strings"
+
+	"github.com/gin-gonic/gin"
 
 	"cardap.in/apperrors"
 	"cardap.in/model"
@@ -20,57 +21,53 @@ const (
 	AccessControlAllowCredentialsValue = "true"
 )
 
-func HandleResponse(model model.RootJSON, resp http.ResponseWriter, err error) {
-	resp.Header().Add(ContentTypeHeader, ApplicationJSONValue)
+func HandleResponse(model model.RootJSON, c *gin.Context, err error) {
+	c.Header(ContentTypeHeader, ApplicationJSONValue)
 	if err != nil {
-		resp.WriteHeader(http.StatusInternalServerError)
-		resp.Write([]byte("{ \"message\": \"" + err.Error() + "\"}"))
+		c.JSON(http.StatusInternalServerError, "{ \"message\": \""+err.Error()+"\"}")
 		return
 	}
 	if model.GetId() == 0 {
-		resp.WriteHeader(http.StatusNotFound)
-		resp.Write([]byte("{}"))
+		c.Writer.WriteHeader(http.StatusNotFound)
+		c.Writer.Write([]byte("{}"))
 		return
 	}
-	json.NewEncoder(resp).Encode(model)
+	c.JSON(http.StatusOK, model)
 }
 
-func HasConflict(model model.ConflictChecker, resp http.ResponseWriter) bool {
+func HasConflict(model model.ConflictChecker, c *gin.Context) bool {
 	if err, params := model.HasConflict(); err != nil {
-		resp.Header().Add(ContentTypeHeader, ApplicationJSONValue)
-		resp.WriteHeader(http.StatusConflict)
-		resp.Write([]byte(`{"message":"` + err.Error() + `","params":["` + strings.Join(params, "\",\"") + `"]}`))
+		c.Header(ContentTypeHeader, ApplicationJSONValue)
+		c.JSON(http.StatusConflict, `{"message":"`+err.Error()+`","params":["`+strings.Join(params, "\",\"")+`"]}`)
 		return true
 	}
 	return false
 }
 
-func HandleEmptySliceResponse(modelSize int, resp http.ResponseWriter, writeJson func(resp http.ResponseWriter, jsonModel interface{}), jsonModel interface{}, err error) {
+func HandleEmptySliceResponse(modelSize int, c *gin.Context, jsonModel interface{}, err error) {
 	if err != nil {
-		resp.WriteHeader(http.StatusInternalServerError)
-		resp.Write([]byte("{ \"message:\"" + err.Error() + "}"))
+		c.JSON(http.StatusInternalServerError, "{ \"message\": \""+err.Error()+"\"}")
 		return
 	}
 	if modelSize == 0 {
-		resp.WriteHeader(http.StatusNotFound)
-		resp.Write([]byte("[]"))
+		c.Writer.WriteHeader(http.StatusNotFound)
+		c.Writer.Write([]byte("[]"))
 		return
 	}
-	writeJson(resp, jsonModel)
+	c.JSON(http.StatusOK, jsonModel)
 }
 
-func HandleEmptySliceResp(modelSize int, resp http.ResponseWriter, writeJson func(resp http.ResponseWriter, jsonModel interface{}), jsonModel interface{}, appError *apperrors.AppError) {
+func HandleEmptySliceResp(modelSize int, c *gin.Context, jsonModel interface{}, appError *apperrors.AppError) {
 	if appError != nil {
-		resp.WriteHeader(appError.Code)
-		resp.Write([]byte("{ \"message:\"" + appError.Error.Error() + "}"))
+		c.JSON(http.StatusInternalServerError, "{ \"message\": \""+appError.Error.Error()+"\"}")
 		return
 	}
 	if modelSize == 0 {
-		resp.WriteHeader(http.StatusNotFound)
-		resp.Write([]byte("[]"))
+		c.Writer.WriteHeader(http.StatusNotFound)
+		c.Writer.Write([]byte("[]"))
 		return
 	}
-	writeJson(resp, jsonModel)
+	c.JSON(http.StatusOK, jsonModel)
 }
 
 func GetToken(req *http.Request) string {
